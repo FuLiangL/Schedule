@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>排班表</title>
+    <script>
+    	var calculatSeize = function () {
+		    var BASE_FONT_SIZE = 100;
+		    var roat =1;
+		    var docEl = document.documentElement,
+		        clientWidth = docEl.clientWidth;
+		        clientHeight = docEl.clientHeight;
+		    if (!clientWidth) return;
+		    var html_font_size = BASE_FONT_SIZE * ((clientWidth*roat) / 750);
+		    docEl.style.fontSize = html_font_size+'px';
+		    if (html_font_size-parseFloat(getComputedStyle(docEl).fontSize)<0.01&&html_font_size-parseFloat(getComputedStyle(docEl).fontSize)>-0.01) {
+		        return;
+		    } else {
+		        var again_html_font_size = html_font_size/(parseInt(getComputedStyle(docEl).fontSize)/html_font_size);
+		        docEl.style.fontSize = again_html_font_size + 'px';
+		    }
+		};
+		if (document.addEventListener) {
+		    var resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize';
+		    window.addEventListener(resizeEvt, calculatSeize, false);
+		    document.addEventListener('DOMContentLoaded', calculatSeize, false);
+		    calculatSeize();
+		}
+    </script>
+    <style>
+        *{ margin: 0; padding: 0; font-size: 0.24rem; font-family: '微软雅黑'; }
+        ul, li{ list-style: none; }
+        html, body, .main{
+            width: 100%; height: 100%;
+            -webkit-touch-callout: none; 
+            -webkit-text-size-adjust: none; 
+            -webkit-highlight: none; 
+            -webkit-tap-highlight-color: rgba(0,0,0,0); 
+            font-size: 16px; 
+            font-family: "Microsoft Yahei", Arial, Helvetica, sans-serif, "宋体";
+            background: -webkit-linear-gradient(top, #fff 0%,#bef0ff 100%);
+            position: relative;
+        }
+        .main .head{ width: 6rem; height: 1rem; padding-top: 0.5rem; padding-left: 1rem; }
+        .main .head span{ width: 1.5rem; height: 1rem; background: #000; float: left; margin-left: 0.5rem; border-radius: 0.3rem; text-align: center; line-height: 1rem; font-size: 0.36rem; color: #fff; }
+        .main .head span:nth-of-type(1){ margin-left: 0; background: #FC9D99; }
+        .main .head span:nth-of-type(2){ background: #00CCFF; }
+        .main .head span:nth-of-type(3){ background: #AEDD81; }
+        .main .list{ width: 6rem; height: 8rem; position: absolute; left: 0.75rem; top: 50%; margin-top: -3.5rem; }
+        .main .list li{ width: 1rem; height: 1rem; float: left; background: #fff; position: relative; color: #fff; border-radius: 0.2rem; }
+        .main .list li:nth-of-type(1):after,
+        .main .list li:nth-of-type(2):after,
+        .main .list li:nth-of-type(3):after,
+        .main .list li:nth-of-type(4):after,
+        .main .list li:nth-of-type(5):after,
+        .main .list li:nth-of-type(6):after{ width: 1rem; height: 1rem; position: absolute; left: 0; top: 0; background: rgba(0,0,0,0.4); content: ""; border-radius: 0.2rem; }
+        .main .list li.one{ background:  #FC9D99; }
+        .main .list li.two{ background:  #00CCFF; }
+        .main .list li.three{ background:  #AEDD81; }
+        .main .list li span{ width: 1rem; height: 0.24rem; position: absolute; left: 0.1rem; top: 0; font-size: 0.2rem; }
+        .main .list li p{ width: 1rem; height: 1rem; text-align: center; line-height: 1rem; font-size: 0.4rem;  }
+        /* 弹窗显示每天上班的 */
+        .activity{
+            display: none;
+            position: fixed; left: 0; top: 0; z-index: 100;
+            width: 100%; height: 100%;
+        }
+        .activity .activityBg{
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            position: relative;
+        }
+        .activity .activityBg .box{
+            width: 4.5rem; height: 6rem;
+            background: #fff;
+            border-radius: 0.2rem;
+            position: absolute;
+            left: 50%; top: 50%;
+            margin-left: -2.25rem;
+            margin-top: -3rem;
+            background: -webkit-linear-gradient(top left, #fff 0%,#FC9D99 100%);
+        }
+        .activity .activityBg .box.one{
+            background: -webkit-linear-gradient(top left, #fff 0%,#FC9D99 100%);
+        }
+        .activity .activityBg .box.two{
+            background: -webkit-linear-gradient(top left, #fff 0%,#00CCFF 100%);
+        }
+        .activity .activityBg .box.three{
+            background: -webkit-linear-gradient(top left, #fff 0%,#AEDD81 100%);
+        }
+        .activity .activityBg .box span{
+            display: block;
+            width: 4.5rem; height: 6rem;
+            font-size: 2rem;
+            text-align: center;
+            line-height: 6rem;
+            color: #fff;
+            text-shadow: 0 0 5px #fff,
+                     0 0 10px #fff,
+                     0 0 15px #fff,
+                     0 0 20px #FC9D99,
+                     0 0 35px #FC9D99,
+                     0 0 40px #FC9D99,
+                     0 0 50px #FC9D99,
+                     0 0 75px #FC9D99;
+        }
+        .activity .activityBg .box span.one{
+            text-shadow: 0 0 5px #fff,
+                     0 0 10px #fff,
+                     0 0 15px #fff,
+                     0 0 20px #FC9D99,
+                     0 0 35px #FC9D99,
+                     0 0 40px #FC9D99,
+                     0 0 50px #FC9D99,
+                     0 0 75px #FC9D99;
+        }
+        .activity .activityBg .box span.two{
+            text-shadow: 0 0 5px #fff,
+                     0 0 10px #fff,
+                     0 0 15px #fff,
+                     0 0 20px #00CCFF,
+                     0 0 35px #00CCFF,
+                     0 0 40px #00CCFF,
+                     0 0 50px #00CCFF,
+                     0 0 75px #00CCFF;
+        }
+        .activity .activityBg .box span.three{
+            text-shadow: 0 0 5px #fff,
+                     0 0 10px #fff,
+                     0 0 15px #fff,
+                     0 0 20px #AEDD81,
+                     0 0 35px #AEDD81,
+                     0 0 40px #AEDD81,
+                     0 0 50px #AEDD81,
+                     0 0 75px #AEDD81;
+        }
+        .activity .activityBg .box div{
+            width: 4.5rem; height: 0.5rem;
+            font-size: 0.3rem;
+            text-align: center; line-height: 0.5rem;
+            position: absolute;
+            left: 0; bottom: 0.4rem;
+            background-image: linear-gradient(160deg, red 20%,blue 80%);
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        .activity .activityBg .box p{
+            width: 1rem; height: 0.5rem;
+            text-align: center; line-height: 0.5rem;
+            position: absolute;
+            right: 0.2rem; top: 0.2rem;
+            background-image: linear-gradient(160deg, red 20%,blue 80%);
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        /* 需要给弹窗设置为弹出的样式，进行了添加tanchuscale */
+        /* 控制弹出窗的动画，开始缩放为0，一直慢慢放大 */
+        @keyframes tanchuscale{
+            from{ transform: scale(0); -webkit-transform: scale(0); }
+            to{ transform: scale(1); -webkit-transform: scale(1);}
+        }
+        @-webkit-keyframes tanchuscale{
+            from{ transform: scale(0); -webkit-transform: scale(0); }
+            to{ transform: scale(1); -webkit-transform: scale(1);}
+        }
+        .tanchuscale{
+            -webkit-animation:tanchuscale 0.5s;
+            animation: tanchuscale 0.5s;
+        }
+    </style>
+</head>
+<body>
+	<div class="main">
+        <!-- 一个弹窗，显示每天上班的人 -->
+        <div class="activity">
+            <div class="activityBg">
+                <div class="box three tanchuscale">
+                    <span>付</span>
+                    <div>2018.12.20</div>
+                    <p>上班卡</p>
+                </div>
+            </div>
+        </div>
+		<div class="head">
+            <span>罗</span>
+            <span>陈</span>
+            <span>吴</span>
+        </div>
+	    <div class="list">
+            
+	    </div>
+    </div>
+    <script src="zepto-1.2.0.min.js"></script> 
+    <script>
+    	// format加上格式的验证的方法
+        // 里面的this指代是new Date();
+        Date.prototype.format = function() {
+            var s = '';
+            var mouth = (this.getMonth() + 1) >= 10 ? (this.getMonth() + 1) : ('0' + (this.getMonth() + 1));
+            var day = this.getDate() >= 10 ? this.getDate() : ('0' + this.getDate());
+            s += this.getFullYear() + '-'; 
+            s += mouth + "-";
+            s += day;
+            return(s);
+        };
+        var allArr = getAllDate(getDateBefore(new Date(), 6).currentlyTime, getDateAfter(new Date(), 41).currentlyTime);
+        var html = '';
+        for(var i=0; i<allArr.length; i++) {
+            if(i==0) {
+                html += '<li onclick="showActivity(this)" title="'+allArr[i]+'" class="'+juColor(allArr[i])+'"><span>'+(allArr[i].split("-")[1]-0)+'月</span><p>'+(allArr[i].split("-")[2]-0)+'</p></li>';
+            } else if(allArr[i].split("-")[1]!=allArr[i-1].split("-")[1]) {
+                html += '<li onclick="showActivity(this)" title="'+allArr[i]+'" class="'+juColor(allArr[i])+'"><span>'+(allArr[i].split("-")[1]-0)+'月</span><p>'+(allArr[i].split("-")[2]-0)+'</p></li>';
+            } else {
+                html += '<li onclick="showActivity(this)" title="'+allArr[i]+'" class="'+juColor(allArr[i])+'"><span style="display:none;">'+(allArr[i].split("-")[1]-0)+'月</span><p>'+(allArr[i].split("-")[2]-0)+'</p></li>';
+            }
+        }
+        $('.list').html(html);
+        // dateObject.setUTCFullYear(年,月,日)
+        // db现在已经更改为bengin的日期，de已经更改为end的日期
+        function getAllDate(begin, end) {
+            var arr = [];
+            var ab = begin.split("-");
+            var ae = end.split("-");
+            var db = new Date(ab[0], ab[1]-1, ab[2], 0, 0, 0);
+            var de = new Date(ae[0], ae[1]-1, ae[2], 0, 0, 0);
+            // db.setUTCFullYear(ab[0], ab[1]-1, ab[2]);
+            // de.setUTCFullYear(ae[0], ae[1]-1, ae[2]);
+            var unixDb = db.getTime();
+            var unixDe = de.getTime();
+            for(var k=unixDb; k<=unixDe;) {
+                arr.push((new Date(parseInt(k))).format());
+                k = k + 24 * 60 * 60 * 1000;
+            }
+            return arr;
+        }
+        // 获取之后的日期
+        function getDateAfter(startDate, days) {
+            var start;
+            var end;
+            if (startDate instanceof Date) {
+                var yearStartDate = startDate.getFullYear();
+                var monthStartDate = startDate.getMonth()+1;
+                var dayStartDate = startDate.getDate();
+                monthStartDate = monthStartDate>9 ? monthStartDate : "0"+monthStartDate;
+                dayStartDate = dayStartDate>9 ? dayStartDate : "0"+dayStartDate;
+                start = startDate.getFullYear() + "-" + (monthStartDate) + "-" + dayStartDate;
+                var startAfterDays = startDate.setDate(startDate.getDate() - 0 + days);
+                startAfterDays = new Date(startAfterDays);
+                var yearEndDate = startAfterDays.getFullYear();
+                var monthEndDate = startAfterDays.getMonth()+1;
+                var dayEndDate = startAfterDays.getDate();
+                monthEndDate = monthEndDate>9 ? monthEndDate : "0"+monthEndDate;
+                dayEndDate = dayEndDate>9 ? dayEndDate : "0"+dayEndDate;
+                end = startAfterDays.getFullYear() + "-" + (monthEndDate) + "-" + dayEndDate;
+            }
+            return {
+                beforeTime: start,
+                currentlyTime: end 
+            };
+        }
+        // 获取之前的日期
+        function getDateBefore(startDate, days) {
+            var start;
+            var end;
+            if (startDate instanceof Date) {
+                var yearStartDate = startDate.getFullYear();
+                var monthStartDate = startDate.getMonth()+1;
+                var dayStartDate = startDate.getDate();
+                monthStartDate = monthStartDate>9 ? monthStartDate : "0"+monthStartDate;
+                dayStartDate = dayStartDate>9 ? dayStartDate : "0"+dayStartDate;
+                start = startDate.getFullYear() + "-" + (monthStartDate) + "-" + dayStartDate;
+                var startAfterDays = startDate.setDate(startDate.getDate() - days);
+                startAfterDays = new Date(startAfterDays);
+                var yearEndDate = startAfterDays.getFullYear();
+                var monthEndDate = startAfterDays.getMonth()+1;
+                var dayEndDate = startAfterDays.getDate();
+                monthEndDate = monthEndDate>9 ? monthEndDate : "0"+monthEndDate;
+                dayEndDate = dayEndDate>9 ? dayEndDate : "0"+dayEndDate;
+                end = startAfterDays.getFullYear() + "-" + (monthEndDate) + "-" + dayEndDate;
+            }
+            return {
+                beforeTime: start,
+                currentlyTime: end 
+            };
+        }
+        // 判断展示不同的颜色,传入时间格式
+        function juColor(str) {
+            var strTime = new Date(str.split("-")[0],str.split("-")[1]-0-1,str.split("-")[2]-0,0,0,0).getTime();
+            // a->罗(one),b->陈(two),c->吴(three) 
+            var ax = new Date('2018','11','21','0','0','0').getTime();
+            var ay = new Date('2018','11','22','0','0','0').getTime();
+            var bx = new Date('2018','11','23','0','0','0').getTime();
+            var by = new Date('2018','11','24','0','0','0').getTime();
+            var cx = new Date('2018','11','25','0','0','0').getTime();
+            var cy = new Date('2018','11','26','0','0','0').getTime();
+            if(((strTime-ax)/518400000)%1==0||((strTime-ay)/518400000)%1==0) {
+                return 'one';
+            } else if(((strTime-bx)/518400000)%1==0||((strTime-by)/518400000)%1==0) {
+                return 'two';
+            } else if(((strTime-cx)/518400000)%1==0||((strTime-cy)/518400000)%1==0) {
+                return 'three';
+            }
+        }
+        // 控制弹窗显示
+        function showActivity(obj) {
+            var name = '';
+            var className = '';
+            if($(obj).attr("class").indexOf('one')>-1) {
+                $('.activity .box').attr('class', 'box one tanchuscale');
+                name = '罗';
+                className = 'one';
+            } else if($(obj).attr("class").indexOf('two')>-1) {
+                $('.activity .box').attr('class', 'box two tanchuscale');
+                name = '陈';
+                className = 'two';
+            } else if($(obj).attr("class").indexOf('three')>-1) {
+                $('.activity .box').attr('class', 'box three tanchuscale');
+                name = '吴';
+                className = 'three';
+            }
+            var html = '<span class="'+className+'">'+name+'</span>'+
+                        '<div>'+$(obj).attr("title").replace('-', '.').replace('-', '.')+'</div>'+
+                        '<p>上班卡</p>';
+            $('.activity .box').html(html);
+            $('.activity').show();
+        }
+        $('.activityBg').on('touchmove', function(e) {
+            e.preventDefault(false);
+        });
+        $('.activityBg').on('click', function(e) {
+            $('.activity').hide();
+            e.preventDefault(false);
+        });
+        $('.main').on('touchmove', function(e) {
+            e.preventDefault(false);
+        });
+        // 一上来直接调用
+        showActivity($('li')[6]);
+    </script>
+</body>
+</html>
