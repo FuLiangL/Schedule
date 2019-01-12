@@ -81,7 +81,11 @@
             background: -webkit-linear-gradient(top left, #fff 0%,#FC9D99 100%);
         }
         .activity .activityBg .box.one{
-            background: -webkit-linear-gradient(top left, #fff 0%,#FC9D99 100%);
+            background-image: url(love.jpg);
+            background-size: 6rem 6rem;
+            background-position: -1.5rem 0rem;
+            background-repeat: no-repeat;
+            /* background: -webkit-linear-gradient(top left, #fff 0%,#FC9D99 100%); */
         }
         .activity .activityBg .box.two{
             background: -webkit-linear-gradient(top left, #fff 0%,#00CCFF 100%);
@@ -308,20 +312,23 @@
             var className = '';
             if($(obj).attr("class").indexOf('one')>-1) {
                 $('.activity .box').attr('class', 'box one tanchuscale');
-                name = '罗';
+                name = '';
                 className = 'one';
+                cardName = '';
             } else if($(obj).attr("class").indexOf('two')>-1) {
                 $('.activity .box').attr('class', 'box two tanchuscale');
                 name = '陈';
                 className = 'two';
+                cardName = '上班卡';
             } else if($(obj).attr("class").indexOf('three')>-1) {
                 $('.activity .box').attr('class', 'box three tanchuscale');
                 name = '吴';
                 className = 'three';
+                cardName = '上班卡';
             }
             var html = '<span class="'+className+'">'+name+'</span>'+
                         '<div>'+$(obj).attr("title").replace('-', '.').replace('-', '.')+'</div>'+
-                        '<p>上班卡</p>';
+                        '<p>'+cardName+'</p>';
             $('.activity .box').html(html);
             $('.activity').show();
         }
